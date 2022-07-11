@@ -39,4 +39,20 @@ public class UserRepositoryTest {
             assertThat(userExist.getEmail()).isEqualTo(user.getEmail());
         }
     }
+
+    @Test
+    public void testFindUserByUsername() {
+        String username = "daninsky";
+
+        userRepository.deleteAll();
+        userRepository.save(new User("daninsky", "dan@dan.com", "1234"));
+        userRepository.save(new User("marina", "ma@dan.com", "1234"));
+        userRepository.save(new User("jose", "jose@dan.com", "1234"));
+        userRepository.save(new User("zilda", "zilda@dan.com", "1234"));
+
+        User user = userRepository.findByUsername(username);
+
+        assertThat(user).isNotNull();
+        System.out.println(user);
+    }
 }

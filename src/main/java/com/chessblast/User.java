@@ -51,5 +51,9 @@ public class User {
         this.password = password;
     }
 
-
+    @Override
+    public String toString() {
+        return String.format("Customer[id='%d', firstName='%s', lastName='%s'",
+                id, username, email);
+    }
 }

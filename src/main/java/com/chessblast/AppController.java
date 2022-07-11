@@ -29,6 +29,6 @@ public class AppController {
 
     @GetMapping("/login")
     public String loginPage(User user) {
-        return "login"
+        return "login";
     }
 }
