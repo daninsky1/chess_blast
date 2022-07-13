@@ -1,37 +1,63 @@
 package com.chessblast.model;
 
 
+import lombok.NoArgsConstructor;
+
 import javax.persistence.*;
+import java.util.Set;
 
 @Entity(name = "User")
-@Table(name = "users",
-       uniqueConstraints = {@UniqueConstraint(name = "UK_student_username", columnNames = "username"),
-                            @UniqueConstraint(name = "UK_student_email", columnNames = "email")})
+@Table(
+    name = "users",
+    uniqueConstraints = {
+        @UniqueConstraint(name = "UK_student_username", columnNames = "username"),
+        @UniqueConstraint(name = "UK_student_email", columnNames = "email")
+    }
+)
+@NoArgsConstructor
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @SequenceGenerator(
+        name = "user_sequence",
+        sequenceName = "user_sequence",
+        allocationSize = 1
+    )
+    @GeneratedValue(
+        strategy = GenerationType.SEQUENCE,
+        generator = "student_sequence"
+    )
     @Column(name = "id")
     private Long id;
-    @Column(name = "username",
-            nullable = false,
-            length = 50)
+
+    @Column(
+        name = "username",
+        nullable = false,
+        length = 50
+    )
     private String username;
-    @Column(name = "email",
-            nullable = false,
-            length = 50)
+
+    @Column(
+        name = "email",
+        nullable = false,
+        length = 50
+    )
     private String email;
-    @Column(name = "password",
-            nullable = false,
-            length = 64)
+
+    @Column(
+        name = "password",
+        nullable = false,
+        length = 64
+    )
     private String password;
+
+    @ManyToMany(mappedBy = "participants")
+    Set<Game> participate;
 
     public User(String username, String email, String password) {
         this.username = username;
         this.email = email;
         this.password = password;
     }
-
-    public User() { }
 
     public Long getId() {
         return id;
