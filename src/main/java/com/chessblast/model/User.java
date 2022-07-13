@@ -10,8 +10,8 @@ import java.util.Set;
 @Table(
     name = "users",
     uniqueConstraints = {
-        @UniqueConstraint(name = "UK_student_username", columnNames = "username"),
-        @UniqueConstraint(name = "UK_student_email", columnNames = "email")
+        @UniqueConstraint(name = "UK_user_username", columnNames = "username"),
+        @UniqueConstraint(name = "UK_user_email", columnNames = "email")
     }
 )
 @NoArgsConstructor
@@ -24,7 +24,7 @@ public class User {
     )
     @GeneratedValue(
         strategy = GenerationType.SEQUENCE,
-        generator = "student_sequence"
+        generator = "user_sequence"
     )
     @Column(name = "id")
     private Long id;
