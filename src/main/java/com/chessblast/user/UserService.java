@@ -2,6 +2,7 @@ package com.chessblast.user;
 
 
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -22,21 +23,20 @@ public class UserService implements UserDetailsService {
         );
     }
 
-//    public String signUpUser(User user) throws IllegalAccessException {
-//        boolean userExist = userRepository.findByUsername(user.getUsername()).isPresent();
-//
-//        if (userExist) {
-//            throw new IllegalAccessException("Email already taken!");
-//        } else {
-//            String encodedPassword = bCryptPasswordEncoder.encode(user.getPassword());
-//            user.setPassword(encodedPassword);
-//
-//            userRepository.save(user);
-//
-//            // TODO: Send confirmation token
-//
-//            return "It Works";
-//        }
-//
-//    }
+    public String signUpUser(User user) throws IllegalAccessException {
+        boolean userExist = userRepository.findByUsername(user.getUsername()).isPresent();
+
+        if (userExist) {
+            throw new IllegalAccessException("Username already taken!");
+        } else {
+            String encodedPassword = bCryptPasswordEncoder.encode(user.getPassword());
+            user.setPassword(encodedPassword);
+
+            userRepository.save(user);
+
+            // TODO: Send confirmation token
+
+            return "It Works";
+        }
+    }
 }
