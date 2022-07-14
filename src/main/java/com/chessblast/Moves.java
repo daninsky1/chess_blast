@@ -1,4 +1,4 @@
-package com.chessblast.model;
+package com.chessblast;
 
 import lombok.NoArgsConstructor;
 

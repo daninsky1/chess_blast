@@ -1,7 +1,7 @@
-package com.chessblast.model;
+package com.chessblast;
 
 
-import lombok.AllArgsConstructor;
+import com.chessblast.user.User;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
