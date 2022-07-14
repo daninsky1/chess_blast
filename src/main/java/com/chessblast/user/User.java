@@ -4,10 +4,12 @@ package com.chessblast.user;
 import com.chessblast.Game;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
 
 @Entity(name = "User")
@@ -49,6 +51,8 @@ public class User implements UserDetails {
     @ManyToMany(mappedBy = "participants")
     Set<Game> participate;
 
+    private final UserRole userRole = UserRole.PLAYER;
+
     public User(long id, String username, String email, String password) {
         this.id = id;
         this.username = username;
@@ -58,7 +62,8 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        SimpleGrantedAuthority authority = new SimpleGrantedAuthority(userRole.name());
+        return Collections.singletonList(authority);    // NOTE: returns an immutable list
     }
 
     public Long getId() {
