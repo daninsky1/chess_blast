@@ -1,9 +1,13 @@
-package com.chessblast.model;
+package com.chessblast.user;
 
 
+import com.chessblast.Game;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import java.util.Collection;
 import java.util.Set;
 
 @Entity(name = "User")
@@ -15,7 +19,7 @@ import java.util.Set;
     }
 )
 @NoArgsConstructor
-public class User {
+public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -45,15 +49,23 @@ public class User {
     @ManyToMany(mappedBy = "participants")
     Set<Game> participate;
 
-    public User(String username, String email, String password) {
+    public User(long id, String username, String email, String password) {
+        this.id = id;
         this.username = username;
         this.email = email;
         this.password = password;
     }
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return null;
+    }
+
     public Long getId() {
         return id;
     }
+
+    @Override
     public String getUsername() {
         return username;
     }
@@ -70,6 +82,7 @@ public class User {
         this.email = email;
     }
 
+    @Override
     public String getPassword() {
         return password;
     }
@@ -79,8 +92,28 @@ public class User {
     }
 
     @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
+    @Override
     public String toString() {
-        return String.format("Customer[id='%d', firstName='%s', lastName='%s'",
+        return String.format("User[id='%d', firstName='%s', lastName='%s'",
                 id, username, email);
     }
 }
