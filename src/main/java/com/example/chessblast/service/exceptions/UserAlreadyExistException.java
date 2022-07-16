@@ -1,4 +1,4 @@
-package com.example.chessblast.user;
+package com.example.chessblast.service.exceptions;
 
 
 public class UserAlreadyExistException extends Exception {
