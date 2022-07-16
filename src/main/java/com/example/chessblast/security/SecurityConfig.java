@@ -1,6 +1,6 @@
 package com.example.chessblast.security;
 
-import com.example.chessblast.user.UserService;
+import com.example.chessblast.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

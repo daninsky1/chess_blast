@@ -1,11 +1,11 @@
 package com.example.chessblast;
 
 import com.example.chessblast.game.Game;
-import com.example.chessblast.user.EmailAlreadyExistException;
+import com.example.chessblast.service.exceptions.EmailAlreadyExistException;
 import com.example.chessblast.user.User;
-import com.example.chessblast.user.UserAlreadyExistException;
+import com.example.chessblast.service.exceptions.UserAlreadyExistException;
 import com.example.chessblast.user.UserRepository;
-import com.example.chessblast.user.UserService;
+import com.example.chessblast.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
