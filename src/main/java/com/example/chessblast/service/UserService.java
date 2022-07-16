@@ -1,12 +1,21 @@
-package com.example.chessblast.user;
+package com.example.chessblast.service;
 
+import com.example.chessblast.game.Game;
 import com.example.chessblast.game.GameRepository;
+import com.example.chessblast.move.Move;
+import com.example.chessblast.service.exceptions.EmailAlreadyExistException;
+import com.example.chessblast.service.exceptions.PlayerIsPlayingAnotherGame;
+import com.example.chessblast.service.exceptions.UserAlreadyExistException;
+import com.example.chessblast.user.User;
+import com.example.chessblast.user.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 
 @Service
@@ -22,6 +31,10 @@ public class UserService implements UserDetailsService {
         return userRepository.findByUsername(username).orElseThrow(
             () -> new UsernameNotFoundException(String.format(USER_NOT_FOUND_MSG, username))
         );
+    }
+
+    public Optional<User> getUserByUsername(String username) {
+        return userRepository.findByUsername(username);
     }
 
     public void signUpUser(User user) throws UserAlreadyExistException, EmailAlreadyExistException {
@@ -40,5 +53,25 @@ public class UserService implements UserDetailsService {
         userRepository.save(user);
     }
 
-    public void createGame
+    public void createGame(User whitePlayer, User blackPlayer) throws PlayerIsPlayingAnotherGame {
+        if (whitePlayer.getPlayingNow() != null) throw new PlayerIsPlayingAnotherGame(
+            "Player " + whitePlayer.getUsername() + " is playing game "
+                + gameRepository.findByWhitePlayer(whitePlayer).get().getId()
+        );
+        if (blackPlayer.getPlayingNow() != null) throw new PlayerIsPlayingAnotherGame(
+            "Player " + blackPlayer.getUsername() + " is playing game "
+                + gameRepository.findByBlackPlayer(blackPlayer).get().getId()
+        );
+
+        Game game = new Game(whitePlayer, blackPlayer);
+        gameRepository.save(game);
+    }
+
+    public void playMove(User player, Game game, String pgnMoveNotation) {
+        Move move = new Move(game, pgnMoveNotation);
+    }
+
+    public void callGameOver(Game game, String result) {
+
+    }
 }
