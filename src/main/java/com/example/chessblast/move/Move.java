@@ -7,9 +7,9 @@ import javax.persistence.*;
 
 
 @Entity(name = "Move")
-@Table(name = "moves")
+@Table(name = "move")
 @NoArgsConstructor
-public class Moves {
+public class Move {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -25,10 +25,10 @@ public class Moves {
         nullable = false,
         length = 64
     )
-    private String pgnMoveNotation;
+    private String standardNotation;
 
-    public Moves(Game game, String pgnMoveNotation) {
+    public Move(Game game, String notation) {
         this.game = game;
-        this.pgnMoveNotation = pgnMoveNotation;
+        this.standardNotation = notation;
     }
 }
