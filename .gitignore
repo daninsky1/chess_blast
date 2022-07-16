@@ -5,6 +5,7 @@ target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
+src/test/resources/anand_kasparov_1996.pgn
 
 ### STS ###
 .apt_generated

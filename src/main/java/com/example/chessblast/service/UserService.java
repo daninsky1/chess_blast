@@ -1,5 +1,6 @@
 package com.example.chessblast.user;
 
+import com.example.chessblast.game.GameRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 public class UserService implements UserDetailsService {
     private final static String USER_NOT_FOUND_MSG = "User: \"%s\" not found.";
     private final UserRepository userRepository;
+    private final GameRepository gameRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Override
@@ -37,4 +39,6 @@ public class UserService implements UserDetailsService {
 
         userRepository.save(user);
     }
+
+    public void createGame
 }
