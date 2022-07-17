@@ -1,7 +1,10 @@
 package com.example.chessblast.move;
 
 import com.example.chessblast.game.Game;
+import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 
@@ -9,7 +12,10 @@ import javax.persistence.*;
 @Entity(name = "Move")
 @Table(name = "move")
 @NoArgsConstructor
+@Getter
+@Setter
 public class Move {
+    @Setter(AccessLevel.NONE)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -23,12 +29,18 @@ public class Move {
 
     @Column(
         nullable = false,
-        length = 64
+        length = 32
     )
-    private String standardNotation;
+    private String whiteMove;   // Chess standard notation
 
-    public Move(Game game, String notation) {
+    @Column(
+        nullable = true,
+        length = 32
+    )
+    private String blackMove;   // Chess standard notation
+
+    public Move(Game game, String whiteMove) {
         this.game = game;
-        this.standardNotation = notation;
+        this.whiteMove = whiteMove;
     }
 }
