@@ -2,10 +2,13 @@ package com.example.chessblast.game;
 
 import com.example.chessblast.move.Move;
 import com.example.chessblast.user.User;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.Set;
 
 
@@ -13,7 +16,9 @@ import java.util.Set;
 @Table(name = "games")
 @NoArgsConstructor
 @Getter
+@Setter
 public class Game {
+    @Setter(AccessLevel.NONE)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -36,18 +41,10 @@ public class Game {
     private GameResult result;
 
     @OneToMany(mappedBy = "game")
-    Set<Move> moves;
+    List<Move> moves;
 
     public Game(User whitePlayer, User blackPlayer) {
         this.whitePlayer = whitePlayer;
         this.blackPlayer = blackPlayer;
-    }
-
-    public GameResult getResult() {
-        return result;
-    }
-
-    public void setResult(GameResult result) {
-        this.result = result;
     }
 }
