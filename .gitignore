@@ -6,6 +6,7 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 src/test/resources/anand_kasparov_1996.pgn
+src/test/resources/carlsen_s_gujrathi_2019.pgn
 
 ### STS ###
 .apt_generated

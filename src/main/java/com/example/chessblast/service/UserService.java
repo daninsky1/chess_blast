@@ -2,6 +2,7 @@ package com.example.chessblast.service;
 
 import com.example.chessblast.game.Game;
 import com.example.chessblast.game.GameRepository;
+import com.example.chessblast.game.GameResult;
 import com.example.chessblast.move.Move;
 import com.example.chessblast.service.exceptions.EmailAlreadyExistException;
 import com.example.chessblast.service.exceptions.PlayerIsPlayingAnotherGame;
@@ -54,24 +55,59 @@ public class UserService implements UserDetailsService {
     }
 
     public void createGame(User whitePlayer, User blackPlayer) throws PlayerIsPlayingAnotherGame {
-        if (whitePlayer.getPlayingNow() != null) throw new PlayerIsPlayingAnotherGame(
+        if (whitePlayer.getActiveGame() != null) throw new PlayerIsPlayingAnotherGame(
             "Player " + whitePlayer.getUsername() + " is playing game "
                 + gameRepository.findByWhitePlayer(whitePlayer).get().getId()
         );
-        if (blackPlayer.getPlayingNow() != null) throw new PlayerIsPlayingAnotherGame(
+        if (blackPlayer.getActiveGame() != null) throw new PlayerIsPlayingAnotherGame(
             "Player " + blackPlayer.getUsername() + " is playing game "
                 + gameRepository.findByBlackPlayer(blackPlayer).get().getId()
         );
-
         Game game = new Game(whitePlayer, blackPlayer);
         gameRepository.save(game);
+
+        whitePlayer.setActiveGame(game);
+        blackPlayer.setActiveGame(game);
+        userRepository.save(whitePlayer);
+        userRepository.save(blackPlayer);
     }
 
-    public void playMove(User player, Game game, String pgnMoveNotation) {
-        Move move = new Move(game, pgnMoveNotation);
+    public void playMove(User player, Game game, String standardNotation) {
+        Move move = new Move(game, standardNotation);
     }
 
-    public void callGameOver(Game game, String result) {
+    public void resignGame(User playerWhoResigned) {
+        Game gameToResign = playerWhoResigned.getActiveGame();
+        Move resign;
+        playerWhoResigned.setActiveGame(null);
+        User opponentPlayer;
+        if (playerWhoResigned == gameToResign.getWhitePlayer()) {
+            resign = new Move(gameToResign, "0-1");
+            gameToResign.setResult(GameResult.BLACK_WIN);
+            opponentPlayer = gameToResign.getBlackPlayer();
+            opponentPlayer.setActiveGame(null);
+        }
+        else {
+            resign = new Move(gameToResign, "1-0");
+            gameToResign.setResult(GameResult.WHITE_WIN);
+            opponentPlayer = gameToResign.getWhitePlayer();
+            opponentPlayer.setActiveGame(null);
+        }
+        gameRepository.save(gameToResign);
+        userRepository.save(playerWhoResigned);
+        userRepository.save(opponentPlayer);
+    }
 
+    public void drawGame(Game gameToDraw) {
+        Move draw = new Move(gameToDraw, "1/2-1/2");
+        gameToDraw.setResult(GameResult.DRAW);
+        User whitePlayer = gameToDraw.getWhitePlayer();
+        User blackPlayer = gameToDraw.getBlackPlayer();
+        whitePlayer.setActiveGame(null);
+        blackPlayer.setActiveGame(null);
+
+        gameRepository.save(gameToDraw);
+        userRepository.save(whitePlayer);
+        userRepository.save(blackPlayer);
     }
 }

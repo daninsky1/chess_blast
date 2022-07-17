@@ -1,5 +1,6 @@
 package com.example.chessblast.user;
 
+import com.example.chessblast.game.Game;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

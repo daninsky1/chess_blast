@@ -9,7 +9,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import javax.persistence.*;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Set;
 
 @Entity(name = "User")
 @Table(
@@ -48,6 +47,21 @@ public class User implements UserDetails {
     private String password;
 
     private final UserRole userRole = UserRole.PLAYER;
+
+    @ManyToOne
+    @JoinColumn(
+        name = "playing_now_game_id", nullable = true,
+        foreignKey = @ForeignKey(name = "FK_player_playing_game")
+    )
+    private Game activeGame = null;
+
+    public Game getActiveGame() {
+        return activeGame;
+    }
+
+    public void setActiveGame(Game activeGame) {
+        this.activeGame = activeGame;
+    }
 
     public User(String username, String email, String password) {
         this.username = username;
