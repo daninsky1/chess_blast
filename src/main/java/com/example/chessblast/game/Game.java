@@ -42,4 +42,12 @@ public class Game {
         this.whitePlayer = whitePlayer;
         this.blackPlayer = blackPlayer;
     }
+
+    public GameResult getResult() {
+        return result;
+    }
+
+    public void setResult(GameResult result) {
+        this.result = result;
+    }
 }
