@@ -1,5 +1,5 @@
 package com.example.chessblast.game;
 
 public enum GameResult {
-    WHITE, BLACK, DRAW;
+    WHITE_WIN, BLACK_WIN, DRAW;
 }
