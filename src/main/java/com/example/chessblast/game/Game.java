@@ -37,10 +37,10 @@ public class Game {
     )
     private User blackPlayer;
 
-    @Column(nullable = true)
+    @Column(name = "result", nullable = true)
     private GameResult result;
 
-    @OneToMany(mappedBy = "game")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "game")
     List<Move> moves;
 
     public Game(User whitePlayer, User blackPlayer) {

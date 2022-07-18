@@ -10,6 +10,7 @@ import javax.persistence.*;
 import java.util.Collection;
 import java.util.Collections;
 
+
 @Entity(name = "User")
 @Table(
     name = "users",
@@ -25,25 +26,13 @@ public class User implements UserDetails {
     @Column(name = "id")
     private Long id;
 
-    @Column(
-        name = "username",
-        nullable = false,
-        length = 50
-    )
+    @Column(name = "username", nullable = false, length = 64)
     private String username;
 
-    @Column(
-        name = "email",
-        nullable = false,
-        length = 128
-    )
+    @Column(name = "email", nullable = false, length = 128)
     private String email;
 
-    @Column(
-        name = "password",
-        nullable = false,
-        length = 64
-    )
+    @Column(name = "password", nullable = false, length = 64)
     private String password;
 
     private final UserRole userRole = UserRole.PLAYER;
