@@ -11,7 +11,6 @@ import javax.persistence.*;
 
 @Entity(name = "Move")
 @Table(name = "moves")
-@NoArgsConstructor
 @Getter
 @Setter
 public class Move {
