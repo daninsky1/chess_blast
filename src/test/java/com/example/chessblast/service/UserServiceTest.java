@@ -2,12 +2,14 @@ package com.example.chessblast.service;
 
 import com.example.chessblast.game.Game;
 import com.example.chessblast.game.GameRepository;
+import com.example.chessblast.game.GameResult;
+import com.example.chessblast.move.Move;
+import com.example.chessblast.move.MoveRepository;
 import com.example.chessblast.service.exceptions.EmailAlreadyExistException;
 import com.example.chessblast.service.exceptions.PlayerIsPlayingAnotherGame;
 import com.example.chessblast.service.exceptions.UserAlreadyExistException;
 import com.example.chessblast.user.User;
 import com.example.chessblast.user.UserRepository;
-import org.junit.Assert;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -17,6 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -33,8 +36,11 @@ class UserServiceTest {
     @Autowired
     private GameRepository gameRepository;
 
+    @Autowired
+    private MoveRepository moveRepository;
+
     private final List<User> users;
-    private final String[][] anandVsKasparovMoves = {    // Game Moves Notation
+    private final String[][] anandVsGarryMoves = {    // Game Moves Notation
         {"e4", "c5"}, {"Nf3", "d6"}, {"cxd4", "Nxd4"}, {"Nf6 ", "Nc3"},
         {"a6", "Be3"}, {"Ng4", "Bg5"}, {"h6", "Bh4"}, {"g5 ", "Bg3"},
         {"Bg7 ", "Be2"}, {"h5", "Bxg4"}, {"Bxg4", "f3"}, {"Bd7 ", "Bf2"},
@@ -59,7 +65,7 @@ class UserServiceTest {
     public UserServiceTest() {
         users = Arrays.asList(
             new User("anand", "viswanathan@anand.com", "password"),
-            new User("kasparov", "garry@kasparov.com", "password"),
+            new User("garry", "garry@kasparov.com", "password"),
             new User("carlsen", "magnus@carlsen.com", "password"),
             new User("vidit", "vidit@gujrathi.com", "password")
         );
@@ -81,14 +87,14 @@ class UserServiceTest {
     @Order(2)
     void createGame() throws PlayerIsPlayingAnotherGame {
         User anand = userService.getUserByUsername("anand").get();
-        User kasparov = userService.getUserByUsername("kasparov").get();
+        User garry = userService.getUserByUsername("garry").get();
 
         User carlsen = userService.getUserByUsername("carlsen").get();
         User vidit = userService.getUserByUsername("vidit").get();
 
         try {
+            userService.createGame(anand, garry);
             userService.createGame(carlsen, vidit);
-            userService.createGame(anand, kasparov);
         }
         catch (PlayerIsPlayingAnotherGame e) {
             fail("Should not throw UserAlreadyExistException");
@@ -97,35 +103,67 @@ class UserServiceTest {
             System.out.println(e.getMessage());
             fail("Should not throw any Exception");
         }
+        assertNotNull(anand.getActiveGame());
+        assertNotNull(garry.getActiveGame());
+        assertEquals(anand.getActiveGame(), garry.getActiveGame());
+
+        assertNotNull(carlsen.getActiveGame());
+        assertNotNull(vidit.getActiveGame());
+        assertEquals(carlsen.getActiveGame(), vidit.getActiveGame());
     }
 
     @Test
     @Order(3)
     void playMove() {
         User anand = userService.getUserByUsername("anand").get();
-        User kasparov = userService.getUserByUsername("kasparov").get();
-        for (String[] move : anandVsKasparovMoves) {
-            userService.addPlayerMove(anand, move[0]);
+        User garry = userService.getUserByUsername("garry").get();
+        for (String[] move : anandVsGarryMoves) {
+            userService.addGameMove(anand, move[0]);
             if (move.length == 2) {
-                userService.addPlayerMove(kasparov, move[1]);
+                userService.addGameMove(garry, move[1]);
+            }
+        }
+
+        List<Move> anandVsGarryStoredMoves =
+            moveRepository.findByGameOrderById(anand.getActiveGame());
+        for (int i = 0; i < anandVsGarryMoves.length; i++) {
+            assertEquals(anandVsGarryStoredMoves.get(i).getWhiteMove(), anandVsGarryMoves[i][0]);
+            if (anandVsGarryMoves[i].length == 2) {
+                assertEquals(anandVsGarryStoredMoves.get(i).getBlackMove(), anandVsGarryMoves[i][1]);
             }
         }
 
         User carlsen = userService.getUserByUsername("carlsen").get();
         User vidit = userService.getUserByUsername("vidit").get();
         for (String[] move : carlsenVsViditMoves) {
-            userService.addPlayerMove(carlsen, move[0]);
+            userService.addGameMove(carlsen, move[0]);
             if (move.length == 2) {
-                userService.addPlayerMove(vidit, move[1]);
+                userService.addGameMove(vidit, move[1]);
+            }
+        }
+
+        List<Move> carlsenVsViditStoredMoves =
+            moveRepository.findByGameOrderById(carlsen.getActiveGame());
+        for (int i = 0; i < carlsenVsViditMoves.length; i++) {
+            assertEquals(carlsenVsViditStoredMoves.get(i).getWhiteMove(), carlsenVsViditMoves[i][0]);
+            if (carlsenVsViditMoves[i].length == 2) {
+                assertEquals(carlsenVsViditStoredMoves.get(i).getBlackMove(), carlsenVsViditMoves[i][1]);
             }
         }
     }
-//
+
+    //
     @Test
     @Order(4)
     void resignGame() {
-        User kasparov = userService.getUserByUsername("kasparov").get();
-        userService.resignGame(kasparov);
+        User garry = userService.getUserByUsername("garry").get();
+        Game game = garry.getActiveGame();
+        User garryOpponent = game.getWhitePlayer();     // Anand
+        userService.resignGame(garry);
+
+        assertNull(garry.getActiveGame());
+        assertNull(garryOpponent.getActiveGame());
+        assertEquals(game.getResult(), GameResult.WHITE_WON);
     }
 
     @Test
@@ -133,6 +171,11 @@ class UserServiceTest {
     void drawGame() {
         User carlsen = userService.getUserByUsername("carlsen").get();
         Game game = carlsen.getActiveGame();
+        User carlsenOpponent = game.getBlackPlayer();   // Vidit
         userService.drawGame(game);
+
+        assertNull(carlsen.getActiveGame());
+        assertNull(carlsenOpponent.getActiveGame());
+        assertEquals(game.getResult(), GameResult.DRAW);
     }
 }
