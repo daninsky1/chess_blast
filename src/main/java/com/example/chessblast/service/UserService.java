@@ -4,6 +4,7 @@ import com.example.chessblast.game.Game;
 import com.example.chessblast.game.GameRepository;
 import com.example.chessblast.game.GameResult;
 import com.example.chessblast.move.Move;
+import com.example.chessblast.move.MoveRepository;
 import com.example.chessblast.service.exceptions.EmailAlreadyExistException;
 import com.example.chessblast.service.exceptions.PlayerIsPlayingAnotherGame;
 import com.example.chessblast.service.exceptions.UserAlreadyExistException;
@@ -26,6 +27,7 @@ public class UserService implements UserDetailsService {
     private final static String USER_NOT_FOUND_MSG = "User: \"%s\" not found.";
     private final UserRepository userRepository;
     private final GameRepository gameRepository;
+    private final MoveRepository moveRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Override
@@ -73,20 +75,26 @@ public class UserService implements UserDetailsService {
         userRepository.save(blackPlayer);
     }
 
-    public void addPlayerMove(User player, String standardNotation) {
+    public void addGameMove(User player, String standardNotation) {
         Game activeGame = player.getActiveGame();
-        List<Move> moves = activeGame.getMoves();
+        List<Move> moves = moveRepository.findByGameOrderById(activeGame);
         Move lastMove = moves.isEmpty() ? null : moves.get(moves.size()-1);
 
-        if (moves.isEmpty() || (lastMove.getBlackMove() != null)) {
-            // Create new move and write white player move
-            moves.add(new Move(activeGame, standardNotation));
+        if (!moves.isEmpty()) {
+            if (!lastMove.getBlackMove().isEmpty()) {
+                // Write white player move
+                moveRepository.save(new Move(activeGame, standardNotation));
+            }
+            else {
+                // Write black player move
+                lastMove.setBlackMove(standardNotation);
+                moveRepository.save(lastMove);
+            }
         }
         else {
-            // Write black move
-            lastMove.setBlackMove(standardNotation);
+            // Write first move
+            moveRepository.save(new Move(activeGame, standardNotation));
         }
-        gameRepository.save(activeGame);
     }
 
     public void resignGame(User playerWhoResigned) {
@@ -110,6 +118,7 @@ public class UserService implements UserDetailsService {
 
     public void drawGame(Game gameToDraw) {
         gameToDraw.setResult(GameResult.DRAW);
+        List<Move> gameMoves = moveRepository.findByGameOrderById(gameToDraw);
         gameRepository.save(gameToDraw);
 
         User whitePlayer = gameToDraw.getWhitePlayer();
