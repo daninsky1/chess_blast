@@ -10,7 +10,7 @@ import javax.persistence.*;
 
 
 @Entity(name = "Move")
-@Table(name = "move")
+@Table(name = "moves")
 @NoArgsConstructor
 @Getter
 @Setter
