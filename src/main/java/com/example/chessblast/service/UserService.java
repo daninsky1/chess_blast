@@ -16,6 +16,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -72,24 +73,33 @@ public class UserService implements UserDetailsService {
         userRepository.save(blackPlayer);
     }
 
-    public void playMove(User player, Game game, String standardNotation) {
-        Move move = new Move(game, standardNotation);
+    public void addPlayerMove(User player, String standardNotation) {
+        Game activeGame = player.getActiveGame();
+        List<Move> moves = activeGame.getMoves();
+        Move lastMove = moves.isEmpty() ? null : moves.get(moves.size()-1);
+
+        if (moves.isEmpty() || (lastMove.getBlackMove() != null)) {
+            // Create new move and write white player move
+            moves.add(new Move(activeGame, standardNotation));
+        }
+        else {
+            // Write black move
+            lastMove.setBlackMove(standardNotation);
+        }
+        gameRepository.save(activeGame);
     }
 
     public void resignGame(User playerWhoResigned) {
         Game gameToResign = playerWhoResigned.getActiveGame();
-        Move resign;
         playerWhoResigned.setActiveGame(null);
         User opponentPlayer;
         if (playerWhoResigned == gameToResign.getWhitePlayer()) {
-            resign = new Move(gameToResign, "0-1");
-            gameToResign.setResult(GameResult.BLACK_WIN);
+            gameToResign.setResult(GameResult.BLACK_WON);
             opponentPlayer = gameToResign.getBlackPlayer();
             opponentPlayer.setActiveGame(null);
         }
         else {
-            resign = new Move(gameToResign, "1-0");
-            gameToResign.setResult(GameResult.WHITE_WIN);
+            gameToResign.setResult(GameResult.WHITE_WON);
             opponentPlayer = gameToResign.getWhitePlayer();
             opponentPlayer.setActiveGame(null);
         }
@@ -99,14 +109,13 @@ public class UserService implements UserDetailsService {
     }
 
     public void drawGame(Game gameToDraw) {
-        Move draw = new Move(gameToDraw, "1/2-1/2");
         gameToDraw.setResult(GameResult.DRAW);
+        gameRepository.save(gameToDraw);
+
         User whitePlayer = gameToDraw.getWhitePlayer();
         User blackPlayer = gameToDraw.getBlackPlayer();
         whitePlayer.setActiveGame(null);
         blackPlayer.setActiveGame(null);
-
-        gameRepository.save(gameToDraw);
         userRepository.save(whitePlayer);
         userRepository.save(blackPlayer);
     }
