@@ -27,16 +27,10 @@ public class Move {
     )
     private Game game;
 
-    @Column(
-        nullable = false,
-        length = 32
-    )
+    @Column(name = "white_move", nullable = false, length = 32)
     private String whiteMove;   // Chess standard notation
 
-    @Column(
-        nullable = true,
-        length = 32
-    )
+    @Column(name = "black_move", nullable = true, length = 32)
     private String blackMove;   // Chess standard notation
 
     public Move(Game game, String whiteMove) {
