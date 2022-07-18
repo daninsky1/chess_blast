@@ -116,7 +116,7 @@ public class User implements UserDetails {
 
     @Override
     public String toString() {
-        return String.format("User[id='%d', firstName='%s', lastName='%s'",
+        return String.format("User[id='%d', username='%s', email='%s'",
                 id, username, email);
     }
 }
