@@ -1,12 +1,17 @@
 package com.example.chessblast.service;
 
+import com.example.chessblast.game.Game;
 import com.example.chessblast.game.GameRepository;
 import com.example.chessblast.service.exceptions.EmailAlreadyExistException;
 import com.example.chessblast.service.exceptions.PlayerIsPlayingAnotherGame;
 import com.example.chessblast.service.exceptions.UserAlreadyExistException;
 import com.example.chessblast.user.User;
 import com.example.chessblast.user.UserRepository;
+import org.junit.Assert;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -17,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 @SpringBootTest
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class UserServiceTest {
     @Autowired
     UserService userService;
@@ -52,27 +58,33 @@ class UserServiceTest {
 
     public UserServiceTest() {
         users = Arrays.asList(
-            new User("carlsen", "magnus@carlsen.com", "password"),
-            new User("vidit", "vidit@gujrathi.com", "password"),
             new User("anand", "viswanathan@anand.com", "password"),
-            new User("kasparov", "garry@kasparov.com", "password")
+            new User("kasparov", "garry@kasparov.com", "password"),
+            new User("carlsen", "magnus@carlsen.com", "password"),
+            new User("vidit", "vidit@gujrathi.com", "password")
         );
     }
 
     @Test
+    @Order(1)
     void signUpUser() throws UserAlreadyExistException, EmailAlreadyExistException {
         for (User user : users) {
             userService.signUpUser(user);
         }
+        for (User user : users) {
+            userService.getUserByUsername(user.getUsername());
+//            assertEquals();
+        }
     }
 
     @Test
+    @Order(2)
     void createGame() throws PlayerIsPlayingAnotherGame {
-        User carlsen = userService.getUserByUsername("carlsen").get();
-        User vidit = userService.getUserByUsername("vidit").get();
-
         User anand = userService.getUserByUsername("anand").get();
         User kasparov = userService.getUserByUsername("kasparov").get();
+
+        User carlsen = userService.getUserByUsername("carlsen").get();
+        User vidit = userService.getUserByUsername("vidit").get();
 
         try {
             userService.createGame(carlsen, vidit);
@@ -88,30 +100,39 @@ class UserServiceTest {
     }
 
     @Test
+    @Order(3)
     void playMove() {
-        User carlsen = userService.getUserByUsername("carlsen").get();
-        User vidit = userService.getUserByUsername("vidit").get();
-
         User anand = userService.getUserByUsername("anand").get();
         User kasparov = userService.getUserByUsername("kasparov").get();
-
         for (String[] move : anandVsKasparovMoves) {
-            userService.playMove(anand, anand.getActiveGame(), move[0]);
+            userService.addPlayerMove(anand, move[0]);
             if (move.length == 2) {
-                userService.playMove(kasparov, kasparov.getActiveGame(), move[1]);
+                userService.addPlayerMove(kasparov, move[1]);
             }
         }
+
+        User carlsen = userService.getUserByUsername("carlsen").get();
+        User vidit = userService.getUserByUsername("vidit").get();
         for (String[] move : carlsenVsViditMoves) {
-            userService.playMove(carlsen, anand.getActiveGame(), move[0]);
+            userService.addPlayerMove(carlsen, move[0]);
             if (move.length == 2) {
-                userService.playMove(vidit, kasparov.getActiveGame(), move[1]);
+                userService.addPlayerMove(vidit, move[1]);
             }
         }
     }
 //
     @Test
+    @Order(4)
     void resignGame() {
         User kasparov = userService.getUserByUsername("kasparov").get();
         userService.resignGame(kasparov);
+    }
+
+    @Test
+    @Order(5)
+    void drawGame() {
+        User carlsen = userService.getUserByUsername("carlsen").get();
+        Game game = carlsen.getActiveGame();
+        userService.drawGame(game);
     }
 }
