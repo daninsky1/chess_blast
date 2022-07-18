@@ -35,7 +35,7 @@ public class User implements UserDetails {
     @Column(
         name = "email",
         nullable = false,
-        length = 50
+        length = 128
     )
     private String email;
 
@@ -50,8 +50,8 @@ public class User implements UserDetails {
 
     @ManyToOne
     @JoinColumn(
-        name = "playing_now_game_id", nullable = true,
-        foreignKey = @ForeignKey(name = "FK_player_playing_game")
+        name = "active_game_id", nullable = true,
+        foreignKey = @ForeignKey(name = "FK_player_active_game")
     )
     private Game activeGame = null;
 
