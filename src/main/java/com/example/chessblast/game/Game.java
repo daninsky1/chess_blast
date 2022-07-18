@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 
 @Entity(name = "Game")
@@ -30,7 +30,7 @@ public class Game {
     )
     private User whitePlayer;
 
-    @ManyToOne(cascade = CascadeType.MERGE)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     @JoinColumn(
         name = "black_player_id", nullable = false,
         foreignKey = @ForeignKey(name = "FK_black_player_game")
@@ -41,7 +41,8 @@ public class Game {
     private GameResult result;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "game")
-    List<Move> moves;
+    @OrderBy("id ASC")
+    List<Move> moves = new ArrayList<Move>();
 
     public Game(User whitePlayer, User blackPlayer) {
         this.whitePlayer = whitePlayer;

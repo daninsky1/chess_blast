@@ -20,9 +20,10 @@ public class Move {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
-        name = "game_id", nullable = false,
+        name = "game_id",
+        nullable = false,
         foreignKey = @ForeignKey(name = "FK_game_move")
     )
     private Game game;
@@ -36,5 +37,7 @@ public class Move {
     public Move(Game game, String whiteMove) {
         this.game = game;
         this.whiteMove = whiteMove;
+        this.blackMove = "";
+        game.getMoves().add(this);
     }
 }
