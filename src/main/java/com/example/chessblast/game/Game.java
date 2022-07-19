@@ -30,7 +30,7 @@ public class Game {
     )
     private User whitePlayer;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+    @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(
         name = "black_player_id", nullable = false,
         foreignKey = @ForeignKey(name = "FK_black_player_game")

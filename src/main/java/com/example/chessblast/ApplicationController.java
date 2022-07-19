@@ -51,11 +51,6 @@ public class ApplicationController {
             model.addAttribute("errormsg", e.getMessage());
             return "signup_fail";
         }
-//        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-//        String passwordHash = passwordEncoder.encode(user.getPassword());
-//        user.setPassword(passwordHash);
-//
-//        userRepository.save(user);
         return "signup_success";
     }
 
