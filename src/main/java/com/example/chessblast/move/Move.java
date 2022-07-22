@@ -40,4 +40,9 @@ public class Move {
         this.blackMove = "";
         game.getMoves().add(this);
     }
+
+    public void setGame(Game game) {
+        this.game = game;
+        game.getMoves().add(this);
+    }
 }
