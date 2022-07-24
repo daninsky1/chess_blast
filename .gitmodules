@@ -1,3 +1,6 @@
 [submodule "src/main/resources/static/chessboardjs"]
 	path = src/main/resources/static/chessboardjs
 	url = https://github.com/oakmac/chessboardjs/
+[submodule "src/main/resources/static/chessjs"]
+	path = src/main/resources/static/chessjs
+	url = https://github.com/jhlywa/chess.js.git
